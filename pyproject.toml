@@ -1,0 +1,20 @@
+[project]
+name = "project-03-python-semalt-pars"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Alexander Rovenskikh",email = "alex.lz11@yandex.ru"}
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "requests (>=2.32.4,<3.0.0)",
+    "bs4 (>=0.0.2,<0.0.3)",
+    "lxml (>=6.0.0,<7.0.0)",
+    "html5lib (>=1.1,<2.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

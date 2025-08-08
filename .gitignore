@@ -1,0 +1,9 @@
+.venv/
+*cache*
+.vscode/
+.idea/
+.pythonlibs/
+.upm/
+.replit
+replit.nix
+git_auto
