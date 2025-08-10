@@ -1,5 +1,6 @@
 import requests
 import json
+import csv
 from bs4 import BeautifulSoup as bs
 
 def get_soup(url, parser='lxml'):
@@ -29,8 +30,8 @@ def get_data(url):
     if category_cont:
         cat_links = [a['href'] for a in category_cont.select('a.category__item')]
         for link in cat_links:
-            prod_data.append(get_data(link))
-        return {category_name: prod_data}
+            prod_data = prod_data + get_data(link)
+        return prod_data
     else:
         pagination = soup.select_one('ul.pagination').select('li')
         max_page = 1 if not pagination else len(pagination) - 2
@@ -40,19 +41,31 @@ def get_data(url):
             products = [product_tag for product_tag in product_cont.select('div.products__item-desc')]
             for product in products:
                 p_name = product.select_one('a.products__item-title').text
-                p_price = product.select_one('span.products__item-price').text
+                p_price = int(product.select_one('span.products__item-price').text.strip(' ₽\n\t'))
                 prod_data.append({'name': p_name, 'price': p_price})
             page += 1
             if page <= max_page:
                 next_link = url + f'?page={page}'
                 soup = get_soup(next_link)
-        return {category_name: prod_data}
+        return [{category_name: prod_data}]
 
 
 
-scheme = 'https://alsemya.ru/all-categories'
+scheme = 'https://alsemya.ru/semena-ovoshhi/semena-morkovi/'
 
 products = get_data(scheme)
 
+csv_header = ['Категория', 'Наименование товара', 'Стоимость, руб']
+with open('SA_MSK_product_list.csv', 'w', encoding='utf-8-sig', newline='') as ouf:
+    writer = csv.writer(ouf, delimiter=';')
+    writer.writerow(csv_header)
+
 with open('product_list.json', 'w', encoding='utf-8') as ouf:
     json.dump(products, ouf, indent=4, ensure_ascii=False)
+
+with open('SA_MSK_product_list.csv', 'a', encoding='utf-8-sig', newline='') as ouf:
+    writer = csv.writer(ouf, delimiter=';')
+    for category in products:
+        cat_name, prods = [a for a in category.items()][0]
+        for prod in prods:
+            writer.writerow([cat_name, prod['name'], prod['price']])
