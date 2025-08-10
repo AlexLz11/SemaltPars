@@ -1,6 +1,7 @@
 import requests
 import json
 import csv
+import time
 from bs4 import BeautifulSoup as bs
 
 def get_soup(url, parser='lxml'):
@@ -17,11 +18,6 @@ def get_soup(url, parser='lxml'):
     html.encoding = 'utf-8'
     return bs(html.text, parser)
 
-# def get_categories(url):
-#     soup = get_soup(url)
-#     cats = {a.select_one('h3.category__item-title').text: a['href'] for a in soup.select_one('div.category__grid').select('a.category__item')}
-#     return cats
-
 def get_data(url):
     soup = get_soup(url)
     prod_data = []
@@ -33,15 +29,19 @@ def get_data(url):
             prod_data = prod_data + get_data(link)
         return prod_data
     else:
-        pagination = soup.select_one('ul.pagination').select('li')
-        max_page = 1 if not pagination else len(pagination) - 2
+        pagination = soup.select_one('ul.pagination')
+        max_page = 1 if not pagination else len(pagination.select('li')) - 2
         page = 1
         while page <= max_page:
             product_cont = soup.select_one('div.products__grid')
-            products = [product_tag for product_tag in product_cont.select('div.products__item-desc')]
+            products = [] if not product_cont else [product_tag for product_tag in product_cont.select('div.products__item-desc')]
             for product in products:
                 p_name = product.select_one('a.products__item-title').text
-                p_price = int(product.select_one('span.products__item-price').text.strip(' ₽\n\t'))
+                p_price = product.select_one('span.products__item-price').text.strip(' ₽\n\t')
+                try:
+                    p_price = int(p_price)
+                except Exception as e:
+                    print(f'Категория: {category_name}, товар: {p_name}. Некорректное значение стоимости - {p_price}')
                 prod_data.append({'name': p_name, 'price': p_price})
             page += 1
             if page <= max_page:
@@ -50,8 +50,8 @@ def get_data(url):
         return [{category_name: prod_data}]
 
 
-
-scheme = 'https://alsemya.ru/semena-ovoshhi/semena-morkovi/'
+start = time.time()
+scheme = 'https://alsemya.ru/all-categories'
 
 products = get_data(scheme)
 
@@ -69,3 +69,7 @@ with open('SA_MSK_product_list.csv', 'a', encoding='utf-8-sig', newline='') as o
         cat_name, prods = [a for a in category.items()][0]
         for prod in prods:
             writer.writerow([cat_name, prod['name'], prod['price']])
+
+stop = time.time()
+t = stop - start
+print(f'Время выполнения = {t}')
