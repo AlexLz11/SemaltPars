@@ -30,6 +30,12 @@ def get_price(tag, c_name, p_name):
         print(f'Категория: {c_name}, товар: {p_name}. Некорректное значение стоимости - {price}')
         return price
 
+def get_name(name):
+    repls = {'гр.р': 'гр.', 'шт.р': 'шт.'}
+    for old, new in repls.items():
+        name = name.replace(old, new)
+    return name
+
 def get_data(url, session = None):
     soup = get_soup(url, session)
     prod_data = []
@@ -48,7 +54,7 @@ def get_data(url, session = None):
             product_cont = soup.select_one('div.products__grid')
             products = [] if not product_cont else [product_tag for product_tag in product_cont.select('div.products__item-desc')]
             for product in products:
-                p_name = product.select_one('a.products__item-title').text
+                p_name = get_name(product.select_one('a.products__item-title').text)
                 p_price = get_price(product, category_name, p_name)
                 prod_data.append({'name': p_name, 'price': p_price})
             page += 1
