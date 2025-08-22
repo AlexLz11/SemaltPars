@@ -52,7 +52,7 @@ def get_data(url, scheme, session=None):
         return prod_data
     else:
         pagination = soup.select_one('div.bx-pagination')
-        max_page = 1 if not pagination else len(pagination.select('li')) - 2
+        max_page = 1 if not pagination else int(pagination.select('li')[-2].select_one('span').text)
         page = 1
         while page <= max_page:
             products = items_cont.select('div.product-item') if items_cont.select('div.product-item') else []
