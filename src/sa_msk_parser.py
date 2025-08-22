@@ -47,20 +47,21 @@ def get_data(url, session = None):
             prod_data = prod_data + get_data(link, session)
         return prod_data
     else:
-        pagination = soup.select_one('ul.pagination')
-        max_page = 1 if not pagination else len(pagination.select('li')) - 2
-        page = 1
-        while page <= max_page:
+        page, next_pagin = 1, True
+        while next_pagin:
             product_cont = soup.select_one('div.products__grid')
             products = [] if not product_cont else [product_tag for product_tag in product_cont.select('div.products__item-desc')]
             for product in products:
                 p_name = get_name(product.select_one('a.products__item-title').text)
                 p_price = get_price(product, category_name, p_name)
                 prod_data.append({'name': p_name, 'price': p_price})
+            pagination = soup.select_one('ul.pagination')
+            if not pagination or pagination.select('li')[-1].select_one('span'):
+                next_pagin = False
+                continue
             page += 1
-            if page <= max_page:
-                next_link = url + f'?page={page}'
-                soup = get_soup(next_link, session)
+            next_link = url + f'&page={page}'
+            soup = get_soup(next_link, session)
         return [{category_name: prod_data}]
 
 if __name__ == '__main__':
