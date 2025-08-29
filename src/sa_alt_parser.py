@@ -35,7 +35,8 @@ def get_name(name):
         name = name.replace(old, new)
     return name
 
-def get_data(url, scheme, session=None):
+def get_data(url, session=None):
+    scheme = 'https://altsemena.org'
     soup = get_soup(url, session)
     prod_data = []
     category_cont = soup.select_one('div.bx_catalog_tile')
@@ -69,10 +70,9 @@ def get_data(url, scheme, session=None):
 
 if __name__ == '__main__':
     start = time.time()
-    start_url = 'https://altsemena.org/catalog/'
-    scheme = 'https://altsemena.org'
+    url = 'https://altsemena.org/catalog/'
     with requests.Session() as rs:   
-        products = get_data(start_url, scheme, rs)
+        products = get_data(url, rs)
 
     csv_header = ['Категория', 'Наименование товара', 'Стоимость, руб']
     curr_dt = datetime.now()

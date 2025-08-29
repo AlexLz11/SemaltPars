@@ -66,10 +66,10 @@ def get_data(url, session = None):
 
 if __name__ == '__main__':
     start = time.time()
-    scheme = 'https://alsemya.ru/all-categories'
+    url = 'https://alsemya.ru/all-categories'
     with requests.Session() as rs:
 
-        products = get_data(scheme, rs)
+        products = get_data(url, rs)
 
     csv_header = ['Категория', 'Наименование товара', 'Стоимость, руб']
     curr_dt = datetime.now()
