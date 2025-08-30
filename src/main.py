@@ -9,7 +9,7 @@ def save_result(data, site):
     csv_header = ['Категория', 'Наименование товара', 'Стоимость, руб']
     curr_dt = datetime.now()
     curr_dt_str = curr_dt.strftime('%Y-%m-%d_%H%M%S')
-    with open(f'{site}_product_list_{curr_dt_str}.csv', 'a', encoding='utf-8-sig', newline='') as ouf:
+    with open(f'collected_data_csv\\{site}_product_list_{curr_dt_str}.csv', 'a', encoding='utf-8-sig', newline='') as ouf:
         writer = csv.writer(ouf, delimiter=';')
         writer.writerow(csv_header)
         for category in data:
@@ -22,7 +22,7 @@ def parsing(site, url):
     print(f'Выполняется парсинг данных с сайта {site}...')
     t_start = time.time()
     with requests.Session() as rs:
-        data = sa_msk_parser.get_data(url, rs) if site == 'SA_MSK' else sa_alt_parser(url,rs)
+        data = sa_msk_parser.get_data(url, rs) if site == 'SA_MSK' else sa_alt_parser.get_data(url,rs)
     t_stop = time.time()
     tm = t_stop - t_start
     print(f'Готово! Время выполнения {tm} секунд.')

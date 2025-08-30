@@ -49,7 +49,7 @@ def get_data(url, session=None):
             url_tags = soup.select('h2.bx_catalog_tile_title a')
         cat_links = [scheme + a['href'] for a in url_tags]
         for link in cat_links:
-            prod_data = prod_data + get_data(link, scheme, session)
+            prod_data = prod_data + get_data(link, session)
         return prod_data
     else:
         pagination = soup.select_one('div.bx-pagination')
